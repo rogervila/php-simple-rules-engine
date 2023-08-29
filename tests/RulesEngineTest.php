@@ -177,7 +177,7 @@ final class RulesEngineTest extends TestCase
      */
     public function test_facts_example(): void
     {
-        $animalClass = new class {
+        $animalClass = new class () {
             public string $eats = '';
             public string $lives = '';
             public string $color = '';
