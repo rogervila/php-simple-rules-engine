@@ -14,8 +14,7 @@ class Evaluation
         protected bool $stop = false,
         protected array $extra = [],
         protected array $history = [],
-    )
-    {
+    ) {
     }
 
     public function getRule(): ?Rule

@@ -23,7 +23,7 @@ final class RulesEngineTest extends TestCase
 
     public function test_returns_evaluation_with_result(): void
     {
-        $ruleClass = new class extends Rule {
+        $ruleClass = new class () extends Rule {
             public function evaluate(mixed $subject, ?Evaluation $previousEvaluation = null): Evaluation
             {
                 $evaluation = new Evaluation(result: null);
@@ -33,7 +33,7 @@ final class RulesEngineTest extends TestCase
             }
         };
 
-        $rules = [new $ruleClass];
+        $rules = [new $ruleClass()];
 
         $evaluation = RulesEngine::run('foo', $rules);
         $this->assertInstanceOf(Evaluation::class, $evaluation);
@@ -54,7 +54,7 @@ final class RulesEngineTest extends TestCase
 
     public function test_stops_when_defined(): void
     {
-        $stopRuleClass = new class extends Rule {
+        $stopRuleClass = new class () extends Rule {
             public static int $count = 0;
 
             public function evaluate(mixed $subject, ?Evaluation $previousEvaluation = null): Evaluation
@@ -65,7 +65,7 @@ final class RulesEngineTest extends TestCase
             }
         };
 
-        $neverReachedRuleClass = new class extends Rule {
+        $neverReachedRuleClass = new class () extends Rule {
             public static int $count = 0;
 
             public function evaluate(mixed $subject, ?Evaluation $previousEvaluation = null): Evaluation
@@ -76,7 +76,7 @@ final class RulesEngineTest extends TestCase
             }
         };
 
-        $rules = [$stopRule = new $stopRuleClass, $neverReachedRule = new $neverReachedRuleClass];
+        $rules = [$stopRule = new $stopRuleClass(), $neverReachedRule = new $neverReachedRuleClass()];
         $evaluation = RulesEngine::run(uniqid('the subject '), $rules);
 
         $this->assertInstanceOf(Evaluation::class, $evaluation);
@@ -88,14 +88,14 @@ final class RulesEngineTest extends TestCase
 
     public function test_evaluation_extra_field(): void
     {
-        $ruleAClass = new class extends Rule {
+        $ruleAClass = new class () extends Rule {
             public function evaluate(mixed $subject, ?Evaluation $previousEvaluation = null): Evaluation
             {
                 return new Evaluation(result: uniqid(), extra: ['foo' => uniqid(), 'bar' => 'xyz']);
             }
         };
 
-        $ruleBClass = new class extends Rule {
+        $ruleBClass = new class () extends Rule {
             public function evaluate(mixed $subject, ?Evaluation $previousEvaluation = null): Evaluation
             {
                 $evaluation = new Evaluation(result: uniqid(), extra: $previousEvaluation?->getExtra() ?? []);
@@ -105,7 +105,7 @@ final class RulesEngineTest extends TestCase
             }
         };
 
-        $rules = [new $ruleAClass, new $ruleBClass];
+        $rules = [new $ruleAClass(), new $ruleBClass()];
         $evaluation = RulesEngine::run(uniqid('the subject '), $rules);
 
         $this->assertEquals(['foo' => 123, 'bar' => 'xyz'], $evaluation?->getExtra());
@@ -120,7 +120,7 @@ final class RulesEngineTest extends TestCase
         $visa = '4345634566789888';
         $mastercard = '2228345634567898';
 
-        $amexRuleClass = new class extends Rule {
+        $amexRuleClass = new class () extends Rule {
             public function evaluate(mixed $subject, ?Evaluation $previousEvaluation = null): Evaluation
             {
                 return new Evaluation(
@@ -132,7 +132,7 @@ final class RulesEngineTest extends TestCase
 
         $this->assertEquals('amex', $amexRuleClass->evaluate($amex)->getResult());
 
-        $visaRuleClass = new class extends Rule {
+        $visaRuleClass = new class () extends Rule {
             public function evaluate(mixed $subject, ?Evaluation $previousEvaluation = null): Evaluation
             {
                 return new Evaluation(
@@ -144,7 +144,7 @@ final class RulesEngineTest extends TestCase
 
         $this->assertEquals('visa', $visaRuleClass->evaluate($visa)->getResult());
 
-        $mastercardRuleClass = new class extends Rule {
+        $mastercardRuleClass = new class () extends Rule {
             public function evaluate(mixed $subject, ?Evaluation $previousEvaluation = null): Evaluation
             {
                 return new Evaluation(
@@ -156,7 +156,7 @@ final class RulesEngineTest extends TestCase
 
         $this->assertEquals('mastercard', $mastercardRuleClass->evaluate($mastercard)->getResult());
 
-        $rules = [new $visaRuleClass, new $amexRuleClass, new $mastercardRuleClass];
+        $rules = [new $visaRuleClass(), new $amexRuleClass(), new $mastercardRuleClass()];
 
         for ($i = 0; $i < random_int(10, 20); $i++) {
             shuffle($rules);
@@ -183,17 +183,17 @@ final class RulesEngineTest extends TestCase
             public string $color = '';
         };
 
-        $frog = new $animalClass;
+        $frog = new $animalClass();
         $frog->eats = 'flies';
         $frog->lives = 'water';
         $frog->color = 'green';
 
-        $bird = new $animalClass;
+        $bird = new $animalClass();
         $bird->eats = 'worms';
         $bird->lives = 'nest';
         $bird->color = 'black';
 
-        $eatsRuleClass = new class extends Rule {
+        $eatsRuleClass = new class () extends Rule {
             public const FACTS = ['flies' => 'frog', 'worms' => 'bird'];
             public function evaluate(mixed $subject, ?Evaluation $previousEvaluation = null): Evaluation
             {
@@ -210,7 +210,7 @@ final class RulesEngineTest extends TestCase
         $this->assertEquals('frog', $eatsRuleClass->evaluate($frog)->getResult());
         $this->assertEquals('bird', $eatsRuleClass->evaluate($bird)->getResult());
 
-        $livesRuleClass = new class extends Rule {
+        $livesRuleClass = new class () extends Rule {
             public const FACTS = ['water' => 'frog', 'nest' => 'bird'];
             public function evaluate(mixed $subject, ?Evaluation $previousEvaluation = null): Evaluation
             {
@@ -227,7 +227,7 @@ final class RulesEngineTest extends TestCase
         $this->assertEquals('frog', $livesRuleClass->evaluate($frog)->getResult());
         $this->assertEquals('bird', $livesRuleClass->evaluate($bird)->getResult());
 
-        $colorRuleClass = new class extends Rule {
+        $colorRuleClass = new class () extends Rule {
             public const FACTS = ['green' => 'frog', 'black' => 'bird'];
             public function evaluate(mixed $subject, ?Evaluation $previousEvaluation = null): Evaluation
             {
@@ -244,7 +244,7 @@ final class RulesEngineTest extends TestCase
         $this->assertEquals('frog', $colorRuleClass->evaluate($frog)->getResult());
         $this->assertEquals('bird', $colorRuleClass->evaluate($bird)->getResult());
 
-        $rules = [new $eatsRuleClass, new $livesRuleClass, new $colorRuleClass];
+        $rules = [new $eatsRuleClass(), new $livesRuleClass(), new $colorRuleClass()];
 
         for ($i = 0; $i < random_int(10, 20); $i++) {
             shuffle($rules);
@@ -261,21 +261,21 @@ final class RulesEngineTest extends TestCase
 
     public function test_evaluation_with_history(): void
     {
-        $ruleA = new class extends Rule {
+        $ruleA = new class () extends Rule {
             public function evaluate(mixed $subject, ?Evaluation $previousEvaluation = null): Evaluation
             {
                 return new Evaluation(result: 'A', stop: false);
             }
         };
 
-        $ruleB = new class extends Rule {
+        $ruleB = new class () extends Rule {
             public function evaluate(mixed $subject, ?Evaluation $previousEvaluation = null): Evaluation
             {
                 return new Evaluation(result: 'B', stop: false);
             }
         };
 
-        $ruleC = new class extends Rule {
+        $ruleC = new class () extends Rule {
             public function evaluate(mixed $subject, ?Evaluation $previousEvaluation = null): Evaluation
             {
                 return new Evaluation(result: 'C', stop: false);
@@ -285,7 +285,7 @@ final class RulesEngineTest extends TestCase
         $rules = [$ruleA, $ruleB, $ruleC];
 
         $evaluation = RulesEngine::run(
-            subject: uniqid('the subject '),
+            subject: uniqid(),
             rules: $rules,
             withHistory: true
         );
