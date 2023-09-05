@@ -108,7 +108,8 @@ final class RulesEngineTest extends TestCase
         $rules = [new $ruleAClass(), new $ruleBClass()];
         $evaluation = RulesEngine::run(uniqid('the subject '), $rules);
 
-        $this->assertEquals(['foo' => 123, 'bar' => 'xyz'], $evaluation?->getExtra());
+        $this->assertInstanceOf(Evaluation::class, $evaluation);
+        $this->assertEquals(['foo' => 123, 'bar' => 'xyz'], $evaluation->getExtra());
     }
 
     /**
@@ -119,6 +120,7 @@ final class RulesEngineTest extends TestCase
         $amex = '375678956789765';
         $visa = '4345634566789888';
         $mastercard = '2228345634567898';
+        $invalid = uniqid('invalid card ');
 
         $amexRuleClass = new class () extends Rule {
             public function evaluate(mixed $subject, ?Evaluation $previousEvaluation = null): Evaluation
@@ -162,13 +164,20 @@ final class RulesEngineTest extends TestCase
             shuffle($rules);
 
             $evaluation = RulesEngine::run($amex, $rules);
-            $this->assertEquals('amex', $evaluation?->getResult());
+            $this->assertInstanceOf(Evaluation::class, $evaluation);
+            $this->assertEquals('amex', $evaluation->getResult());
 
             $evaluation = RulesEngine::run($visa, $rules);
-            $this->assertEquals('visa', $evaluation?->getResult());
+            $this->assertInstanceOf(Evaluation::class, $evaluation);
+            $this->assertEquals('visa', $evaluation->getResult());
 
             $evaluation = RulesEngine::run($mastercard, $rules);
-            $this->assertEquals('mastercard', $evaluation?->getResult());
+            $this->assertInstanceOf(Evaluation::class, $evaluation);
+            $this->assertEquals('mastercard', $evaluation->getResult());
+
+            $evaluation = RulesEngine::run($invalid, $rules);
+            $this->assertInstanceOf(Evaluation::class, $evaluation);
+            $this->assertNull($evaluation->getResult());
         }
     }
 
@@ -250,12 +259,14 @@ final class RulesEngineTest extends TestCase
             shuffle($rules);
 
             $evaluation = RulesEngine::run($frog, $rules);
-            $this->assertEquals('frog', $evaluation?->getResult());
-            $this->assertEquals($rules[1]::class, $evaluation?->getRule()::class); // @phpstan-ignore-line
+            $this->assertInstanceOf(Evaluation::class, $evaluation);
+            $this->assertEquals('frog', $evaluation->getResult());
+            $this->assertEquals($rules[1]::class, $evaluation->getRule()::class); // @phpstan-ignore-line
 
             $evaluation = RulesEngine::run($bird, $rules);
-            $this->assertEquals('bird', $evaluation?->getResult());
-            $this->assertEquals($rules[1]::class, $evaluation?->getRule()::class); // @phpstan-ignore-line
+            $this->assertInstanceOf(Evaluation::class, $evaluation);
+            $this->assertEquals('bird', $evaluation->getResult());
+            $this->assertEquals($rules[1]::class, $evaluation->getRule()::class); // @phpstan-ignore-line
         }
     }
 

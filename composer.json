@@ -12,6 +12,7 @@
             "email": "rogervila@me.com"
         }
     ],
+    "homepage": "https://github.com/rogervila/php-simple-rules-engine",
     "require": {
         "php": "^8.0"
     },
