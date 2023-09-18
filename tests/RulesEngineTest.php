@@ -312,4 +312,111 @@ final class RulesEngineTest extends TestCase
         $this->assertEquals($ruleC::class, $evaluation->getRule()::class); // @phpstan-ignore-line
         $this->assertEquals('C', $evaluation->getResult()); // @phpstan-ignore-line
     }
+
+    public function test_single_rule(): void
+    {
+        $ruleExample = new class () extends Rule {
+            public function evaluate(mixed $subject, ?Evaluation $previousEvaluation = null): Evaluation
+            {
+                return new Evaluation(result: 'foo', stop: false);
+            }
+        };
+
+        $evaluation = RulesEngine::run(
+            subject: uniqid(),
+            rules: new $ruleExample()
+        );
+
+        $this->assertEquals($ruleExample::class, $evaluation->getRule()::class); // @phpstan-ignore-line
+        $this->assertEquals('foo', $evaluation->getResult()); // @phpstan-ignore-line
+    }
+
+    public function test_multidimensional_rules(): void
+    {
+        $ARule = new class () extends Rule {
+            public function evaluate(mixed $subject, ?Evaluation $previousEvaluation = null): Evaluation
+            {
+                return new Evaluation(result: 'ARule', stop: false);
+            }
+        };
+
+        $BRule = new class () extends Rule {
+            public function evaluate(mixed $subject, ?Evaluation $previousEvaluation = null): Evaluation
+            {
+                return new Evaluation(result: 'BRule', stop: false);
+            }
+        };
+
+        $CRule = new class () extends Rule {
+            public function evaluate(mixed $subject, ?Evaluation $previousEvaluation = null): Evaluation
+            {
+                return new Evaluation(result: 'CRule', stop: false);
+            }
+        };
+
+        $AARule = new class () extends Rule {
+            public function evaluate(mixed $subject, ?Evaluation $previousEvaluation = null): Evaluation
+            {
+                return new Evaluation(result: 'AARule', stop: false);
+            }
+        };
+
+        $AAARule = new class () extends Rule {
+            public function evaluate(mixed $subject, ?Evaluation $previousEvaluation = null): Evaluation
+            {
+                return new Evaluation(result: 'AAARule', stop: false);
+            }
+        };
+
+        $AABRule = new class () extends Rule {
+            public function evaluate(mixed $subject, ?Evaluation $previousEvaluation = null): Evaluation
+            {
+                return new Evaluation(result: 'AABRule', stop: true);
+            }
+        };
+
+        $AACRule = new class () extends Rule {
+            public function evaluate(mixed $subject, ?Evaluation $previousEvaluation = null): Evaluation
+            {
+                return new Evaluation(result: 'AACRule', stop: false);
+            }
+        };
+
+        $rules = [
+            new $ARule(),
+            new $BRule(),
+            [
+                new $AARule(),
+                [
+                    new $AAARule(),
+                    new $AABRule(),
+                    new $AACRule(),
+                ]
+            ],
+            new $CRule()
+        ];
+
+        $evaluation = RulesEngine::run(
+            subject: uniqid(),
+            rules: $rules, // @phpstan-ignore-line
+            withHistory: true
+        );
+
+        $this->assertCount(4, $evaluation->getHistory()); // @phpstan-ignore-line
+
+        $this->assertEquals($ARule::class, $evaluation->getHistory()[0]->getRule()::class); // @phpstan-ignore-line
+        $this->assertEquals('ARule', $evaluation->getHistory()[0]->getResult()); // @phpstan-ignore-line
+
+        $this->assertEquals($BRule::class, $evaluation->getHistory()[1]->getRule()::class); // @phpstan-ignore-line
+        $this->assertEquals('BRule', $evaluation->getHistory()[1]->getResult()); // @phpstan-ignore-line
+
+        $this->assertEquals($AARule::class, $evaluation->getHistory()[2]->getRule()::class); // @phpstan-ignore-line
+        $this->assertEquals('AARule', $evaluation->getHistory()[2]->getResult()); // @phpstan-ignore-line
+
+        $this->assertEquals($AAARule::class, $evaluation->getHistory()[3]->getRule()::class); // @phpstan-ignore-line
+        $this->assertEquals('AAARule', $evaluation->getHistory()[3]->getResult()); // @phpstan-ignore-line
+
+        $this->assertEquals($AABRule::class, $evaluation->getRule()::class); // @phpstan-ignore-line
+        $this->assertEquals('AABRule', $evaluation->getResult()); // @phpstan-ignore-line
+    }
 }

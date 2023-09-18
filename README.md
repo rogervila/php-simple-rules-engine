@@ -94,6 +94,37 @@ var_dump($evaluation->getHistory()[0]->getRule()::class); // string(5) "RuleA"
 var_dump($evaluation->getHistory()[1]->getRule()::class); // string(5) "RuleB"
 ```
 
+### Recursive usage
+
+You might pass rules and array of rules to recursively evaluate them.
+
+> Note: A future version of this library might come with Openswoole support to parallelize the evaluation of each subset of rules.
+
+```php
+use SimpleRulesEngine\Evaluation;
+use SimpleRulesEngine\RulesEngine;
+
+
+$rules = [
+    new ARule(), // 0
+    new BRule(), // 1
+    [
+        new AARule(), // 2
+        [
+            new AAARule(), // 3
+            new AABRule(), // 4
+            new AACRule(), // 5
+        ]
+    ],
+    new CRule() // 6
+];
+
+$evaluation = RulesEngine::run(
+    subject: '...',
+    rules: $rules
+);
+```
+
 ## Examples
 
 The examples are very simple for demo purposes, but they show the basic features this package comes with.
