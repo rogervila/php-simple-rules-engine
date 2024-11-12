@@ -53,6 +53,7 @@ class RulesEngine
                 continue;
             }
 
+            // @phpstan-ignore instanceof.alwaysTrue
             if (!$rule instanceof Rule) {
                 throw new InvalidArgumentException(sprintf(
                     '"%s" should be an instance of %s',
