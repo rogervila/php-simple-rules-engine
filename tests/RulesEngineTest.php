@@ -24,6 +24,7 @@ final class RulesEngineTest extends TestCase
     public function test_returns_evaluation_with_result(): void
     {
         $ruleClass = new class () extends Rule {
+            #[\Override]
             public function evaluate(mixed $subject, ?Evaluation $previousEvaluation = null): Evaluation
             {
                 $evaluation = new Evaluation(result: null);
@@ -57,6 +58,7 @@ final class RulesEngineTest extends TestCase
         $stopRuleClass = new class () extends Rule {
             public static int $count = 0;
 
+            #[\Override]
             public function evaluate(mixed $subject, ?Evaluation $previousEvaluation = null): Evaluation
             {
                 static::$count++;
@@ -68,6 +70,7 @@ final class RulesEngineTest extends TestCase
         $neverReachedRuleClass = new class () extends Rule {
             public static int $count = 0;
 
+            #[\Override]
             public function evaluate(mixed $subject, ?Evaluation $previousEvaluation = null): Evaluation
             {
                 static::$count++;
@@ -89,6 +92,7 @@ final class RulesEngineTest extends TestCase
     public function test_evaluation_extra_field(): void
     {
         $ruleAClass = new class () extends Rule {
+            #[\Override]
             public function evaluate(mixed $subject, ?Evaluation $previousEvaluation = null): Evaluation
             {
                 return new Evaluation(result: uniqid(), extra: ['foo' => uniqid(), 'bar' => 'xyz']);
@@ -96,6 +100,7 @@ final class RulesEngineTest extends TestCase
         };
 
         $ruleBClass = new class () extends Rule {
+            #[\Override]
             public function evaluate(mixed $subject, ?Evaluation $previousEvaluation = null): Evaluation
             {
                 $evaluation = new Evaluation(result: uniqid(), extra: $previousEvaluation?->getExtra() ?? []);
@@ -123,6 +128,7 @@ final class RulesEngineTest extends TestCase
         $invalid = uniqid('invalid card ');
 
         $amexRuleClass = new class () extends Rule {
+            #[\Override]
             public function evaluate(mixed $subject, ?Evaluation $previousEvaluation = null): Evaluation
             {
                 return new Evaluation(
@@ -135,6 +141,7 @@ final class RulesEngineTest extends TestCase
         $this->assertEquals('amex', $amexRuleClass->evaluate($amex)->getResult());
 
         $visaRuleClass = new class () extends Rule {
+            #[\Override]
             public function evaluate(mixed $subject, ?Evaluation $previousEvaluation = null): Evaluation
             {
                 return new Evaluation(
@@ -147,6 +154,7 @@ final class RulesEngineTest extends TestCase
         $this->assertEquals('visa', $visaRuleClass->evaluate($visa)->getResult());
 
         $mastercardRuleClass = new class () extends Rule {
+            #[\Override]
             public function evaluate(mixed $subject, ?Evaluation $previousEvaluation = null): Evaluation
             {
                 return new Evaluation(
@@ -204,6 +212,7 @@ final class RulesEngineTest extends TestCase
 
         $eatsRuleClass = new class () extends Rule {
             public const FACTS = ['flies' => 'frog', 'worms' => 'bird'];
+            #[\Override]
             public function evaluate(mixed $subject, ?Evaluation $previousEvaluation = null): Evaluation
             {
                 $previousResult = $previousEvaluation?->getResult();
@@ -221,6 +230,7 @@ final class RulesEngineTest extends TestCase
 
         $livesRuleClass = new class () extends Rule {
             public const FACTS = ['water' => 'frog', 'nest' => 'bird'];
+            #[\Override]
             public function evaluate(mixed $subject, ?Evaluation $previousEvaluation = null): Evaluation
             {
                 $previousResult = $previousEvaluation?->getResult();
@@ -238,6 +248,7 @@ final class RulesEngineTest extends TestCase
 
         $colorRuleClass = new class () extends Rule {
             public const FACTS = ['green' => 'frog', 'black' => 'bird'];
+            #[\Override]
             public function evaluate(mixed $subject, ?Evaluation $previousEvaluation = null): Evaluation
             {
                 $previousResult = $previousEvaluation?->getResult();
@@ -273,6 +284,7 @@ final class RulesEngineTest extends TestCase
     public function test_evaluation_with_history(): void
     {
         $ruleA = new class () extends Rule {
+            #[\Override]
             public function evaluate(mixed $subject, ?Evaluation $previousEvaluation = null): Evaluation
             {
                 return new Evaluation(result: 'A', stop: false);
@@ -280,6 +292,7 @@ final class RulesEngineTest extends TestCase
         };
 
         $ruleB = new class () extends Rule {
+            #[\Override]
             public function evaluate(mixed $subject, ?Evaluation $previousEvaluation = null): Evaluation
             {
                 return new Evaluation(result: 'B', stop: false);
@@ -287,6 +300,7 @@ final class RulesEngineTest extends TestCase
         };
 
         $ruleC = new class () extends Rule {
+            #[\Override]
             public function evaluate(mixed $subject, ?Evaluation $previousEvaluation = null): Evaluation
             {
                 return new Evaluation(result: 'C', stop: false);
@@ -316,6 +330,7 @@ final class RulesEngineTest extends TestCase
     public function test_single_rule(): void
     {
         $ruleExample = new class () extends Rule {
+            #[\Override]
             public function evaluate(mixed $subject, ?Evaluation $previousEvaluation = null): Evaluation
             {
                 return new Evaluation(result: 'foo', stop: false);
@@ -334,6 +349,7 @@ final class RulesEngineTest extends TestCase
     public function test_multidimensional_rules(): void
     {
         $ARule = new class () extends Rule {
+            #[\Override]
             public function evaluate(mixed $subject, ?Evaluation $previousEvaluation = null): Evaluation
             {
                 return new Evaluation(result: 'ARule', stop: false);
@@ -341,6 +357,7 @@ final class RulesEngineTest extends TestCase
         };
 
         $BRule = new class () extends Rule {
+            #[\Override]
             public function evaluate(mixed $subject, ?Evaluation $previousEvaluation = null): Evaluation
             {
                 return new Evaluation(result: 'BRule', stop: false);
@@ -348,6 +365,7 @@ final class RulesEngineTest extends TestCase
         };
 
         $CRule = new class () extends Rule {
+            #[\Override]
             public function evaluate(mixed $subject, ?Evaluation $previousEvaluation = null): Evaluation
             {
                 return new Evaluation(result: 'CRule', stop: false);
@@ -355,6 +373,7 @@ final class RulesEngineTest extends TestCase
         };
 
         $AARule = new class () extends Rule {
+            #[\Override]
             public function evaluate(mixed $subject, ?Evaluation $previousEvaluation = null): Evaluation
             {
                 return new Evaluation(result: 'AARule', stop: false);
@@ -362,6 +381,7 @@ final class RulesEngineTest extends TestCase
         };
 
         $AAARule = new class () extends Rule {
+            #[\Override]
             public function evaluate(mixed $subject, ?Evaluation $previousEvaluation = null): Evaluation
             {
                 return new Evaluation(result: 'AAARule', stop: false);
@@ -369,6 +389,7 @@ final class RulesEngineTest extends TestCase
         };
 
         $AABRule = new class () extends Rule {
+            #[\Override]
             public function evaluate(mixed $subject, ?Evaluation $previousEvaluation = null): Evaluation
             {
                 return new Evaluation(result: 'AABRule', stop: true);
@@ -376,6 +397,7 @@ final class RulesEngineTest extends TestCase
         };
 
         $AACRule = new class () extends Rule {
+            #[\Override]
             public function evaluate(mixed $subject, ?Evaluation $previousEvaluation = null): Evaluation
             {
                 return new Evaluation(result: 'AACRule', stop: false);
